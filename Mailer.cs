@@ -1,8 +1,9 @@
 // Copyright (c) 2016 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
+// Source https://github.com/diev/Mailer
 
 // Compile with your target C:\Windows\Microsoft.NET\Framework\...\scs.exe Mailer.cs
-// Run Mailer.exe without parameters (or with '?') to get help.
+// Run Mailer.exe without arguments (or with '?') to get the usage help.
 // Change yours parameters below inside this source file and then just recompile.
 
 using System;
@@ -220,6 +221,9 @@ namespace Mailer
         /// <param name="exit">The exit code for OS.</param>
         static void Usage(string err, int exit)
         {
+            Console.WriteLine();
+            Console.WriteLine("Copyright (c) 2016 Dmitrii Evdokimov. All rights reserved.");
+            Console.WriteLine("Source https://github.com/diev/Mailer");
             Console.WriteLine();
             Console.WriteLine("Программа отправки email от {0} ({1}) на {2}:{3}", USER, NAME, HOST, PORT);
             Console.WriteLine("(все константы можно настроить в тексте программы и перекомпилировать с помощью");
