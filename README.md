@@ -1,4 +1,6 @@
 # Mailer
+[![Build status](https://ci.appveyor.com/api/projects/status/ukoqyhda8b706p02/branch/master?svg=true)](https://ci.appveyor.com/project/diev/mailer/branch/master)
+
 A simple console email sender to send reports from batch files without any configs.
 
 ## Make
