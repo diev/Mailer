@@ -6,10 +6,11 @@ A simple console email sender to send reports from batch files without any confi
 ## Make
 Just compile with your target .NET (2.0, 3.5, 4.0+) on your Windows by its bundled C# compiler:
 ```
-C:\Windows\Microsoft.NET\Framework\...\scs.exe Mailer.cs
+C:\Windows\Microsoft.NET\Framework\...\scs.exe /out:Mailer.exe /recurse:*.cs
 ```
 
-Use enclosed simple *compile.cmd* with preset paths for these .NET.
+Use enclosed simple *make.cmd* with preset paths for these .NET.
+Of course you can use MSBuild itself.
 
 ## Usage
 Run without arguments (or with '?' in any place) to get help.
@@ -19,11 +20,11 @@ Mailer.exe ?
 
 Use at least one argument in such order:
 ```
-Mailer to [subject [body [attach]]]
+Mailer to subject body attach
 ```
 
-If instead *to* is '-', it will be used the parameter from source (see *Parameters in source code* below).
-You can write a few recipients separated by ','.
+If instead *to* is '-', it will be used the parameter from source (see *Parameters.cs* below).
+You can write a few recipients separated by ',' (or ';', they will be properly replaced).
 
 If *subject* or *body* starts with:
 * '-' take content from a file in *DOS 866*
@@ -34,7 +35,7 @@ Additionally after *subject* ':' you can specify a number of line in that file (
 
 Same after *body* you can specify a number of lines of that file (from top or bottom, if negative). Default is 0 - entire file.
 
-In *attach* you can specify a few filenames separated by ',' or ';' (it is adjustable - see *Parameters in source code* below).
+In *attach* you can specify a few filenames separated by ',' and ';' (it is adjustable - see *Parameters.ps* below).
 
 If an argument contains spaces, it must be enclosed with quotes "".
 
@@ -60,13 +61,15 @@ Mailer - "Just files" "" "Report 2016.xlsm, My Doc.docx"
 ```
 
 ## Exit codes for ERRORLEVEL
+(They still can be changed during the further development.)
+
 * 0 - Normal
 * 1 - Email sending was canceled
 * 2 - Shown Usage
 * 3 - Wrong argument
 * 4 - File not found
 
-## Parameters in source code
+## Parameters.cs
 ```
 // The email server's IP or DNS host name.
 const string HOST = "192.168.0.1";
@@ -77,19 +80,16 @@ const int PORT = 25;
 // Use the secured connection.
 const bool SSL = false;
 
-// A login to the email server and sender's email (usually they are equal).
+// A username to login into the email server.
 const string USER = "sender@bank.ru";
 
-// A textual sender's name to see in email message.
-const string NAME = "Report Sender";
-
-// A password encoded in Base64. Do not store any passwords as a plain text!
+// A password encoded in Base64 to login into the email server. Do not store any passwords as a plain text!
 const string PASS = "c2VuZGVy";
 
-// Email(s) by default. Maybe separated by ',' signs.
+// Emails of recipients by default. Maybe separated by ',' or ';' signs.
 const string TO = "admin@bank.ru";
 
-// An array of chars to be list separators.
+// An array of chars to be list separators for attached filenames.
 const string LIST = ",;";
 
 // An array of signatures to read files in the proper encoding: -DOS 866 (0), =Windows 1251 (1), *UTF8 (2).
@@ -97,4 +97,4 @@ const string MODE = "-=*"; // DOS 866, Windows 1251, UTF8
 ```
 
 ## License
-Licensed under the Apache License, Version 2.0.
+Licensed under the Apache [License](LICENSE), Version 2.0.
