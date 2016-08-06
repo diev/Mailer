@@ -70,7 +70,7 @@ Mailer - "Just files" "" "Report 2016.xlsm, My Doc.docx"
 * 4 - File not found
 
 ## Parameters.cs
-```
+```cs
 // The email server's IP or DNS host name.
 const string HOST = "192.168.0.1";
 
