@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Mailer by diev</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/diev/Mailer">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/diev/Mailer/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/diev/Mailer/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Mailer</h1>
+          <p>A simple console email sender to send reports from batch files without any configs.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/diev">diev</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a id="mailer" class="anchor" href="#mailer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mailer</h1>
+
+<p><a href="https://ci.appveyor.com/project/diev/mailer/branch/master"><img src="https://ci.appveyor.com/api/projects/status/ukoqyhda8b706p02/branch/master?svg=true" alt="Build status"></a></p>
+
+<p>A simple console email sender to send reports from batch files without any configs.</p>
+
+<h2>
+<a id="make" class="anchor" href="#make" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Make</h2>
+
+<p>Just compile with your target .NET (2.0, 3.5, 4.0+) on your Windows by its bundled C# compiler:</p>
+
+<pre><code>C:\Windows\Microsoft.NET\Framework\...\scs.exe /out:Mailer.exe /recurse:*.cs
+</code></pre>
+
+<p>Use enclosed simple <em>make.cmd</em> with preset paths for these .NET.
+Of course you can use MSBuild itself.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Run without arguments (or with '?' in any place) to get help.</p>
+
+<pre><code>Mailer.exe ?
+</code></pre>
+
+<p>Use at least one argument in such order:</p>
+
+<pre><code>Mailer to subject body attach
+</code></pre>
+
+<p>If instead <em>to</em> is '-', it will be used the parameter from source (see <em>Parameters.cs</em> below).
+You can write a few recipients separated by ',' (or ';', they will be properly replaced).</p>
+
+<p>If <em>subject</em> or <em>body</em> starts with:</p>
+
+<ul>
+<li>'-' take content from a file in <em>DOS 866</em>
+</li>
+<li>'=' take content from a file in <em>Windows 1251</em>
+</li>
+<li>'*' take content from a file in <em>UTF-8</em>
+</li>
+</ul>
+
+<p>Additionally after <em>subject</em> ':' you can specify a number of line in that file (from top or bottom, if negative). Default is 1 (the first line from top of file).</p>
+
+<p>Same after <em>body</em> you can specify a number of lines of that file (from top or bottom, if negative). Default is 0 - entire file.</p>
+
+<p>In <em>attach</em> you can specify a few filenames separated by ',' and ';' (it is adjustable - see <em>Parameters.ps</em> below).</p>
+
+<p>If an argument contains spaces, it must be enclosed with quotes "".</p>
+
+<p>If no arguments or there is '?' somewhere, it will be shown this Usage text.</p>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h2>
+
+<pre><code>Mailer admin@bank.ru Test
+Mailer admin@bank.ru,b.admin@bank.ru,c.admin@bank.ru Test Body-text
+Mailer - "Test subject" "Long body text with spaces."
+Mailer - "Test DOS file" -filename.txt
+Mailer - "Test Win file" =filename.txt
+Mailer - "Test UTF file" *filename.txt
+Mailer - "Test include" "-Body from DOS 866.txt"
+Mailer - "*Subject from UTF-8.txt" "-Body from DOS 866.txt"
+Mailer - "Top 10 lines" -c:\filename.txt:10
+Mailer - "Last 5 lines" -c:\filename.txt:-5
+Mailer - report.txt "" report.txt
+Mailer - -report.txt:2 "Date in subj, file attached." report.txt
+Mailer - =error.log:-1 "Last error in subj!"
+Mailer - Files "3 attachments." file1.txt,file2.txt,file3.txt
+Mailer - "Just files" "" "Report 2016.xlsm, My Doc.docx"
+</code></pre>
+
+<h2>
+<a id="exit-codes-for-errorlevel" class="anchor" href="#exit-codes-for-errorlevel" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exit codes for ERRORLEVEL</h2>
+
+<p>(They still can be changed during the further development.)</p>
+
+<ul>
+<li>0 - Normal</li>
+<li>1 - Email sending was canceled</li>
+<li>2 - Shown Usage</li>
+<li>3 - Wrong argument</li>
+<li>4 - File not found</li>
+</ul>
+
+<h2>
+<a id="parameterscs" class="anchor" href="#parameterscs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Parameters.cs</h2>
+
+<pre><code>// The email server's IP or DNS host name.
+const string HOST = "192.168.0.1";
+
+// The TCP port of SMTP. Default is 25.
+const int PORT = 25;
+
+// Use the secured connection.
+const bool SSL = false;
+
+// A username to login into the email server.
+const string USER = "sender@bank.ru";
+
+// A password encoded in Base64 to login into the email server. Do not store any passwords as a plain text!
+const string PASS = "c2VuZGVy";
+
+// Emails of recipients by default. Maybe separated by ',' or ';' signs.
+const string TO = "admin@bank.ru";
+
+// An array of chars to be list separators for attached filenames.
+const string LIST = ",;";
+
+// An array of signatures to read files in the proper encoding: -DOS 866 (0), =Windows 1251 (1), *UTF8 (2).
+const string MODE = "-=*"; // DOS 866, Windows 1251, UTF8
+</code></pre>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<p>Licensed under the Apache <a href="LICENSE">License</a>, Version 2.0.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
