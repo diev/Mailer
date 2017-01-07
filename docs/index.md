@@ -1,4 +1,4 @@
-# [Mailer](http://diev.github.io/Mailer/)
+# Mailer
 
 [![Build status](https://ci.appveyor.com/api/projects/status/ukoqyhda8b706p02/branch/master?svg=true)](https://ci.appveyor.com/project/diev/mailer/branch/master)
 
@@ -116,4 +116,5 @@ const string MODE = "-=*"; // DOS 866, Windows 1251, UTF8
 
 ## License
 
-Licensed under the Apache [License-2.0](LICENSE).
+Licensed under the [Apache License, 
+Version 2.0](http://www.apache.org/licenses/LICENSE-2.0 "LICENSE").
