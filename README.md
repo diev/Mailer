@@ -3,7 +3,12 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ukoqyhda8b706p02/branch/master?svg=true)](https://ci.appveyor.com/project/diev/mailer/branch/master)
 
 A simple console email sender to send reports from batch files without 
-any configs.
+any configs. Mailer gives you a powerful way to replace the former favorite 
+Blat when it becomes out of use.
+
+Простой консольный почтовый клиент для отправки почтовых сообщений из 
+консольных коммандных файлов, когда программа Blat, некогда популярная, 
+уже не удовлетворяет.
 
 ## Make
 
