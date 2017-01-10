@@ -1,6 +1,7 @@
 # [Mailer](http://diev.github.io/Mailer/)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/ukoqyhda8b706p02/branch/master?svg=true)](https://ci.appveyor.com/project/diev/mailer/branch/master)
+[![GitHub Release](https://img.shields.io/github/release/diev/Mailer.svg)](https://github.com/diev/Mailer/releases/latest)
 
 A simple console email sender to send reports from batch files without 
 any configs. Mailer gives you a powerful way to replace the former favorite 
