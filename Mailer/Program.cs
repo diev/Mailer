@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/Mailer
 
@@ -12,12 +12,9 @@
 #define TRACE
 //#define DEBUG
 
+using Lib;
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
-
-using Lib;
 
 namespace Mailer
 {
@@ -39,42 +36,9 @@ namespace Mailer
             string body = (args.Length > 2) ? args[2] : string.Empty; // "This is a test e-mail message.";
             string attach = (args.Length > 3) ? args[3] : string.Empty;
 
-            int mode;
-            int start = 1; // 1: top, -1: last, n: number +/-
-            int lines = 0; // count of lines, 0: all
-
-            if (subj.Length > 0 && (mode = Parameters.MODE.IndexOf(subj[0])) > -1)
-            {
-                string file = subj.Substring(1);
-                int pos = subj.LastIndexOf(':');
-                if (pos > 2) // -c:...
-                {
-                    file = subj.Substring(1, pos);
-                    int.TryParse(subj.Substring(pos + 1), out start);
-                }
-                subj = TakeFile(mode, file, start, 1);
-            }
-
-            if (body.Length > 0 && (mode = Parameters.MODE.IndexOf(body[0])) > -1)
-            {
-                string file = body.Substring(1);
-                int pos = body.LastIndexOf(':');
-                if (pos > 2) // -c:...
-                {
-                    file = body.Substring(1, pos);
-                    int.TryParse(body.Substring(pos + 1), out lines);
-                    if (lines < 0)
-                    {
-                        start = -1;
-                        lines = -lines;
-                    }
-                }
-                body = TakeFile(mode, file, start, lines);
-            }
-
-            EmailServer server = new EmailServer(
+            EmailSender sender = new EmailSender(
                 Parameters.HOST, Parameters.PORT, Parameters.SSL,
-                Parameters.USER, Password.Decode(Parameters.PASS));
+                Parameters.USER, Parameters.PASS);
 
             string[] attachList = null;
             if (attach.Length > 0)
@@ -83,7 +47,8 @@ namespace Mailer
                 attachList = attach.Split(sep, StringSplitOptions.RemoveEmptyEntries);
             }
 
-            server.SendWait(new EmailMessage(to, subj, body, attachList));
+            sender.SendWait(new EmailMessage(to, subj, body, attachList, 
+                Parameters.MODE, Parameters.LIST));
 
             Environment.Exit(0);
         }
@@ -119,7 +84,7 @@ namespace Mailer
             Console.WriteLine("дополнительно для subject после \':\' можно указать номер строки,");
             Console.WriteLine("а для body - число строк от начала или конца файла.");
             Console.WriteLine();
-            Console.Write("В attach можно указать несколько файлов через [\'{0}\'", Parameters.LIST[0]);
+            Console.Write("В body и attach можно указать несколько файлов через [\'{0}\'", Parameters.LIST[0]);
             for (int i = 1; i < Parameters.LIST.Length; i++)
             {
                 Console.Write(" или \'{0}\'", Parameters.LIST[i]);
@@ -156,92 +121,6 @@ namespace Mailer
             Console.WriteLine("  {0} \"{1}\" \"\" \"Report 2016.xlsm{2} My Doc.docx\"", a, "Just files", Parameters.LIST[0]);
 
             Environment.Exit(exit);
-        }
-
-        /// <summary>
-        /// Takes a file content instead of a text string command line parameter.
-        /// </summary>
-        /// <param name="mode">Encoding of file: 0: DOS 866, 1: Windows 1251, 2: UTF8.</param>
-        /// <param name="file">File to take its content.</param>
-        /// <param name="start">The Start line of file (positive from top [1], negative from bottom [-1]).</param>
-        /// <param name="lines">The Number of lines to take from the file (1 for the subject, 0 for the entire file).</param>
-        /// <returns>The String to use instead of the parameter.</returns>
-        static string TakeFile(int mode, string file, int start, int lines)
-        {
-            if (!File.Exists(file))
-            {
-                Usage("Файл " + file + " не найден!", 4);
-            }
-
-            Encoding enc = Encoding.UTF8;
-            switch (mode)
-            {
-                case 0: // "-"
-                    enc = Encoding.GetEncoding(866);
-                    break;
-
-                case 1: // "="
-                    enc = Encoding.GetEncoding(1251);
-                    break;
-
-                case 2: // "*"
-                    break;
-
-                default: // unreal to be here
-                    Usage("Неверный параметр в имени файла!", 3);
-                    break;
-            }
-
-            if (lines == 0) // entire file, body only
-            {
-                return File.ReadAllText(file, enc);
-            }
-
-            string[] content = File.ReadAllLines(file, enc);
-
-            if (lines == 1) // subject or body
-            {
-                if (start > 0)
-                {
-                    return content[start - 1];
-                }
-                else
-                {
-                    return content[content.Length + start];
-                }
-            }
-
-            // body only
-            int L = content.Length;
-            int n = (lines < L) ? lines : L;
-            StringBuilder sb = new StringBuilder(n * 100);
-
-            if (start > 0)
-            {
-                for (int i = 0; i < n; i++)
-                {
-                    sb.AppendLine(content[i]);
-                }
-
-                if (n < L)
-                {
-                    sb.AppendFormat("-- первые {0} из {1} строк файла --", n, L);
-                }
-            }
-            else
-            {
-                if (n < L)
-                {
-                    sb.AppendFormat("-- последние {0} из {1} строк файла --\n", n, L);
-                }
-
-                for (int i = L - n; i < L; i++)
-                {
-                    sb.AppendLine(content[i]);
-                }
-            }
-
-            return sb.ToString();
         }
     }
 }

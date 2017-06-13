@@ -40,7 +40,9 @@
   <ItemGroup>
     <Compile Include="Lib\App.cs" />
     <Compile Include="Lib\AppTraceListener.cs" />
-    <Compile Include="Lib\Mail.cs" />
+    <Compile Include="Lib\Gateway.cs" />
+    <Compile Include="Lib\EmailSender.cs" />
+    <Compile Include="Lib\EmailMessage.cs" />
     <Compile Include="Lib\Password.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Program.cs" />

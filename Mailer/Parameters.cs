@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/Mailer
 
@@ -7,9 +7,9 @@ namespace Mailer
     class Parameters
     {
         /// <summary>
-        /// The email server's IP or DNS host name.
+        /// The email server's IP or DNS host name (if empty: gateway).
         /// </summary>
-        public const string HOST = "192.168.0.1";
+        public const string HOST = "";
 
         /// <summary>
         /// The TCP port of SMTP. Default is 25.

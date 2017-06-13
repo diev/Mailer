@@ -1,58 +1,17 @@
-﻿// Copyright (c) 2016 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
 
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
-using System.Text;
 using System.Threading;
 
 namespace Lib
 {
-    class EmailMessage : MailMessage
-    {
-        public EmailMessage() { }
-
-        public EmailMessage(string recipients, string subject, string body, string[] files)
-        {
-            this.From = new MailAddress("noreply", App.Name, Encoding.UTF8);
-
-            this.To.Add(recipients.Replace(';', ','));
-            // this.CC
-            // this.Bcc
-            // this.ReplyToList;
-
-            this.Subject = subject;
-            this.Body = body;
-            // this.IsBodyHtml = true;
-            // this.Priority = MailPriority.High;
-
-            foreach (string file in files)
-            {
-                FileInfo fi = new FileInfo(file.Trim());
-                if (fi.Exists)
-                {
-                    Attachment attachment = new Attachment(fi.FullName);
-                    ContentDisposition disposition = attachment.ContentDisposition;
-                    disposition.CreationDate = fi.CreationTime;
-                    disposition.ModificationDate = fi.LastWriteTime;
-                    disposition.ReadDate = fi.LastAccessTime;
-                    this.Attachments.Add(attachment);
-                }
-                else
-                {
-                    Trace.TraceWarning("Attachment file " + fi.FullName + " not found!");
-                }
-            }
-        }
-    }
-
-    class EmailServer
+    class EmailSender
     {
         public string Host;
         public int Port = 25;
@@ -63,13 +22,13 @@ namespace Lib
 
         public int Timeout = 5;
 
-        public EmailServer(string host, int port, bool ssl, string user, string pass)
+        public EmailSender(string host, int port, bool ssl, string user, string pass)
         {
-            Host = host;
+            Host = string.IsNullOrEmpty(host) ? Gateway.DefaultGateway() : host;
             Port = port;
             Ssl = ssl;
             Username = user;
-            Password = pass;
+            Password = Lib.Password.Decode(pass);
         }
 
         public void SendWait(EmailMessage email)

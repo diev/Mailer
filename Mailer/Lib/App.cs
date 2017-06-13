@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
 
@@ -33,19 +33,17 @@ namespace Lib
         static AssemblyName assemblyName = assembly.GetName();
         public static readonly string Name = assemblyName.Name;
 
+        // Major.Minor.Build.Revision
         /// <summary>
-        /// Версия приложения вида 1.1.60805.0
+        /// Версия программы
         /// </summary>
         public static readonly Version Ver = assemblyName.Version;
         /// <summary>
-        /// Дата версии приложения
+        /// Название и версия программы в виде строки (если есть - с номером построения)
         /// </summary>
-        public static readonly DateTime Dated = DateTime.Parse(string.Format("201{0}-{1}-{2}", Ver.Build / 10000, Ver.Build % 10000 / 100, Ver.Build % 100));
-        /// <summary>
-        /// Строка названием и версией приложения
-        /// </summary>
-        public static readonly string Version = string.Format("{0} v{1}", Name, Ver); //Ver.ToString(2), Ver.Build, Ver.Revision
-
+        public static readonly string Version = string.Format("{0} v{1}", Name, Ver.ToString(3)) + 
+            (Ver.Revision > 0 ? " build " + Ver.Revision.ToString() : string.Empty);
+ 
         //public static readonly string attribute = (attribute == null) ? string.Empty : attribute;
         static AssemblyDescriptionAttribute descriptionAttribute = AssemblyDescriptionAttribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute;
         public static readonly string Description = descriptionAttribute.Description;
