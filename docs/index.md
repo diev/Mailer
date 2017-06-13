@@ -88,7 +88,7 @@ Mailer - "Just files" "" "Report 2016.xlsm, My Doc.docx"
 ## Parameters.cs
 
 ```cs
-// The email server's IP or DNS host name.
+// The email server's IP or DNS host name (if empty: gateway).
 const string HOST = "192.168.0.1";
 
 // The TCP port of SMTP. Default is 25.
