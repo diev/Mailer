@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
 
@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Lib
 {
-    class AppTraceListener : DefaultTraceListener
+    public class AppTraceListener : DefaultTraceListener
     {
         public static TraceSwitch TraceConsole = new TraceSwitch("TraceConsole", "Trace level for console in config", "Error");
         public static TraceSwitch TraceLog = new TraceSwitch("TraceLog", "Trace level for log in config", "Verbose");
@@ -20,7 +20,7 @@ namespace Lib
 
         public AppTraceListener(string file)
         {
-            base.LogFileName = file;
+            LogFileName = file;
 
             string path = Path.GetDirectoryName(file);
             if (!Directory.Exists(path))
@@ -31,7 +31,7 @@ namespace Lib
 
         public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string format, params object[] args)
         {
-            this.TraceEvent(eventCache, source, eventType, id, string.Format(format, args));
+            TraceEvent(eventCache, source, eventType, id, string.Format(format, args));
         }
 
         public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string message)
@@ -39,7 +39,7 @@ namespace Lib
             string msg = BuildMessage(eventType, message);
 
             //byte[] bytes = Encoding.GetEncoding(1251).GetBytes(sb.ToString().ToCharArray());
-            if (string.IsNullOrEmpty(base.LogFileName))
+            if (string.IsNullOrEmpty(LogFileName))
             {
                 if (TraceConsole.TraceVerbose)
                 {
@@ -50,7 +50,7 @@ namespace Lib
             {
                 if (TraceLog.TraceVerbose)
                 {
-                    File.AppendAllText(base.LogFileName, msg, Encoding.GetEncoding(1251));
+                    File.AppendAllText(LogFileName, msg, Encoding.GetEncoding(1251));
                 }
             }
         }

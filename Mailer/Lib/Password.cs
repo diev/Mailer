@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
 
@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Lib
 {
-    class Password
+    public class Password
     {
         /// <summary>
         /// The base encoding for text strings. 0: UTF8, 866: DOS, 1251: Windows, etc.

@@ -1,6 +1,8 @@
-﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
+
+using Mailer;
 
 using System;
 using System.Diagnostics;
@@ -11,18 +13,13 @@ using System.Text;
 
 namespace Lib
 {
-    class EmailMessage : MailMessage
+    public class EmailMessage : MailMessage
     {
-        public EmailMessage()
+        public EmailMessage(string recipients, string subject, string body, string[] files)
         {
-        }
+            From = new MailAddress(Parameters.FROM, App.Name, Encoding.UTF8);
 
-        public EmailMessage(string recipients, string subject, string body, string[] files,
-            string mode, string list)
-        {
-            this.From = new MailAddress("noreply", App.Name, Encoding.UTF8);
-
-            this.To.Add(recipients.Replace(';', ','));
+            To.Add(recipients.Replace(';', ','));
             // this.CC
             // this.Bcc
             // this.ReplyToList;
@@ -30,16 +27,17 @@ namespace Lib
             // this.IsBodyHtml = true;
             // this.Priority = MailPriority.High;
 
+            string mode = Parameters.MODE;
             if (subject.Length > 0)
             {
                 int m = mode.IndexOf(subject[0]);
                 if (m > -1)
                 {
-                    this.Subject = SubjBuilder(m, subject);
+                    Subject = SubjBuilder(m, subject);
                 }
                 else
                 {
-                    this.Subject = subject;
+                    Subject = subject;
                 }
             }
 
@@ -47,20 +45,20 @@ namespace Lib
             {
                 if (mode.IndexOf(body[0]) > -1)
                 {
+                    string list = Parameters.LIST;
                     string[] bodyList = body.Split(list.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    body = string.Empty;
                     foreach (string item in bodyList)
                     {
                         int m = mode.IndexOf(item[0]);
                         if (m > -1)
                         {
-                            this.Body += BodyBuilder(m, item);
+                            Body += BodyBuilder(m, item);
                         }
                     }
                 }
                 else
                 {
-                    this.Body = body;
+                    Body = body;
                 }
             }
 
@@ -71,10 +69,12 @@ namespace Lib
                 {
                     Attachment attachment = new Attachment(fi.FullName);
                     ContentDisposition disposition = attachment.ContentDisposition;
+
                     disposition.CreationDate = fi.CreationTime;
                     disposition.ModificationDate = fi.LastWriteTime;
                     disposition.ReadDate = fi.LastAccessTime;
-                    this.Attachments.Add(attachment);
+
+                    Attachments.Add(attachment);
                 }
                 else
                 {
@@ -82,6 +82,7 @@ namespace Lib
                 }
             }
         }
+
         static string SubjBuilder(int mode, string item)
         {
             int line = -1; // the last line by default
@@ -209,6 +210,7 @@ namespace Lib
                     sb.AppendLine(content[i]);
                 }
             }
+
             FileInfo fi = new FileInfo(file);
             sb.AppendFormat("---- eof {0}, {1}B, {2} ----", file, fi.Length, fi.LastWriteTime);
             sb.AppendLine();

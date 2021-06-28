@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
 
@@ -13,7 +13,7 @@ namespace Lib
     /// <summary>
     /// Properties of application
     /// </summary>
-    class App
+    public class App
     {
         #region Info
         /// <summary>
@@ -27,17 +27,17 @@ namespace Lib
         /// <summary>
         /// Файл записи лога приложения
         /// </summary>
-        public static string Log = Path.ChangeExtension(App.Exe, string.Format("{0:yyyyMMdd}.log", DateTime.Now));
+        public static string Log = Path.ChangeExtension(Exe, string.Format("{0:yyyyMMdd}.log", DateTime.Now));
 
-        static Assembly assembly = Assembly.GetCallingAssembly();
-        static AssemblyName assemblyName = assembly.GetName();
-        public static readonly string Name = assemblyName.Name;
+        static readonly Assembly _assembly = Assembly.GetCallingAssembly();
+        static readonly AssemblyName _assemblyName = _assembly.GetName();
+        public static readonly string Name = _assemblyName.Name;
 
         // Major.Minor.Build.Revision
         /// <summary>
         /// Версия программы
         /// </summary>
-        public static readonly Version Ver = assemblyName.Version;
+        public static readonly Version Ver = _assemblyName.Version;
         /// <summary>
         /// Название и версия программы в виде строки (если есть - с номером построения)
         /// </summary>
@@ -45,20 +45,23 @@ namespace Lib
             (Ver.Revision > 0 ? " build " + Ver.Revision.ToString() : string.Empty);
  
         //public static readonly string attribute = (attribute == null) ? string.Empty : attribute;
-        static AssemblyDescriptionAttribute descriptionAttribute = AssemblyDescriptionAttribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute;
+        static readonly AssemblyDescriptionAttribute descriptionAttribute = 
+            Attribute.GetCustomAttribute(_assembly, typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute;
         public static readonly string Description = descriptionAttribute.Description;
 
-        static AssemblyCompanyAttribute companyAttribute = AssemblyCompanyAttribute.GetCustomAttribute(assembly, typeof(AssemblyCompanyAttribute)) as AssemblyCompanyAttribute;
+        static readonly AssemblyCompanyAttribute _companyAttribute = 
+            Attribute.GetCustomAttribute(_assembly, typeof(AssemblyCompanyAttribute)) as AssemblyCompanyAttribute;
         /// <summary>
         /// Компания разработчика приложения
         /// </summary>
-        public static readonly string Company = companyAttribute.Company;
+        public static readonly string Company = _companyAttribute.Company;
 
-        static AssemblyCopyrightAttribute copyrightAttribute = AssemblyCopyrightAttribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute)) as AssemblyCopyrightAttribute;
+        static readonly AssemblyCopyrightAttribute _copyrightAttribute = 
+            Attribute.GetCustomAttribute(_assembly, typeof(AssemblyCopyrightAttribute)) as AssemblyCopyrightAttribute;
         /// <summary>
         /// Авторские права на приложение
         /// </summary>
-        public static readonly string Copyright = copyrightAttribute.Copyright;
+        public static readonly string Copyright = _copyrightAttribute.Copyright;
         #endregion Info
 
         #region Paths
@@ -151,13 +154,11 @@ namespace Lib
             StringBuilder sb = new StringBuilder();
             if (code > 0)
             {
-                sb.Append("Exit ");
-                sb.Append(code);
+                sb.Append("Exit ").Append(code);
             }
             if (msg != null)
             {
-                sb.Append(": ");
-                sb.Append(msg);
+                sb.Append(": ").Append(msg);
             }
             return sb.ToString();
         }

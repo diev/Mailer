@@ -1,6 +1,8 @@
-﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/
+
+using Mailer;
 
 using System;
 using System.ComponentModel;
@@ -11,34 +13,36 @@ using System.Threading;
 
 namespace Lib
 {
-    class EmailSender
+    public class EmailSender
     {
         public string Host;
-        public int Port = 25;
-        public bool Ssl = false;
+        public int Port;
+        public bool Ssl;
 
         public string Username;
         public string Password;
 
-        public int Timeout = 5;
+        public int Timeout;
 
-        public EmailSender(string host, int port, bool ssl, string user, string pass)
+        public EmailSender()
         {
-            Host = string.IsNullOrEmpty(host) ? Gateway.DefaultGateway() : host;
-            Port = port;
-            Ssl = ssl;
-            Username = user;
-            Password = Lib.Password.Decode(pass);
+            Host = Parameters.HOST ?? Gateway.DefaultGateway();
+            Port = Parameters.PORT;
+            Ssl = Parameters.SSL;
+            Username = Parameters.USER;
+            Password = Lib.Password.Decode(Parameters.PASS);
+            Timeout = Parameters.TIMEOUT;
         }
 
         public void SendWait(EmailMessage email)
         {
-            SmtpClient client = new SmtpClient(Host, Port);
-
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential(Username, Password);
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.EnableSsl = Ssl;
+            SmtpClient client = new SmtpClient(Host, Port)
+            {
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(Username, Password),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                EnableSsl = Ssl
+            };
             // client.Timeout = Timeout * 1000; // Ignored for Async
 
             // The userState can be any object that allows your callback 
@@ -89,12 +93,13 @@ namespace Lib
         private static void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
         {
             // Get the unique identifier for this asynchronous operation.
-            String token = (string)e.UserState;
+            string token = (string)e.UserState;
 
             if (e.Cancelled)
             {
                 Trace.TraceWarning("[{0}] Send canceled.", token);
             }
+
             if (e.Error != null)
             {
                 Trace.TraceWarning("[{0}] {1}", token, e.Error.ToString());
@@ -105,10 +110,10 @@ namespace Lib
             }
         }
 
-        class StatusChecker
+        protected class StatusChecker
         {
             private int invokeCount;
-            private int maxCount;
+            private readonly int maxCount;
 
             public bool Canceled = false;
             public bool TimedOut = false;
@@ -128,8 +133,7 @@ namespace Lib
 
                 if (Console.KeyAvailable)
                 {
-                    ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
-                    keyInfo = Console.ReadKey(true);
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                     if (keyInfo.Key == ConsoleKey.Escape)
                     {
                         // Reset the counter and signal the waiting thread.

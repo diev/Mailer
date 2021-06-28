@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2016-2017 Dmitrii Evdokimov. All rights reserved.
+﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
 // Licensed under the Apache License, Version 2.0.
 // Source https://github.com/diev/Mailer
 
 namespace Mailer
 {
-    class Parameters
+    public static class Parameters
     {
         /// <summary>
         /// The email server's IP or DNS host name (if empty: gateway).
@@ -19,17 +19,32 @@ namespace Mailer
         /// <summary>
         /// Use the secured connection.
         /// </summary>
-        public const bool SSL = false;
+        public const bool SSL = true;
 
         /// <summary>
-        /// A login to the email server and sender's email (usually they are equal).
+        /// The timeout in ms.
+        /// </summary>
+        public const int TIMEOUT = 60000;
+
+        /// <summary>
+        /// The sender's name.
+        /// </summary>
+        public const string NAME = "Sender";
+
+        /// <summary>
+        /// The sender's email.
+        /// </summary>
+        public const string FROM = "noreply@bank.ru";
+
+        /// <summary>
+        /// A login to the SMTP server.
         /// </summary>
         public const string USER = "sender@bank.ru";
 
         /// <summary>
         /// A password encoded in Base64. Do not store any passwords as a plain text!
         /// </summary>
-        public const string PASS = "c2VuZGVy";
+        public const string PASS = "********";
 
         /// <summary>
         /// Email(s) by default. Maybe separated by ',' signs.
