@@ -1,20 +1,19 @@
-# Mailer
-
-[![Build status]][appveyor]
-[![GitHub Release]][releases]
+# [Mailer]
 
 A simple console email sender to send reports from batch files without 
-any configs.
+any configs. Mailer gives you a powerful way to replace the former favorite 
+Blat when it becomes out of use.
 
-## Make
+Простой консольный почтовый клиент для отправки почтовых сообщений из 
+консольных коммандных файлов, когда программа Blat, некогда популярная, 
+уже не удовлетворяет.
 
-Just compile with your target .NET (2.0, 3.5, 4.0+) on your Windows by 
-its bundled C# compiler:
+## Settings
 
-    C:\Windows\Microsoft.NET\Framework\...\scs.exe /out:Mailer.exe /recurse:*.cs
+*Windows Credential Manager* (find in *Control Panel*):
 
-Use enclosed simple *make.cmd* with preset paths for these .NET.
-Of course you can use MSBuild itself.
+Add a target name: `SMTP {host} {port} [tls]`,
+user: `{sender@host}`, pass: `{password}`.
 
 ## Usage
 
@@ -26,8 +25,8 @@ Use at least one argument in such order:
 
     Mailer to subject body attach
 
-If instead *to* is '-', it will be used the parameter from source 
-(see *Parameters.cs* below). You can write a few recipients separated 
+If '-' is placed instead *to*, the *sender*'s address will be used.
+You can write a few recipients separated 
 by ',' (or ';', they will be properly replaced).
 
 If *subject* or *body* starts with:
@@ -36,15 +35,14 @@ If *subject* or *body* starts with:
   * '=' take content from a file in *Windows 1251*
   * '\*' take content from a file in *UTF-8*
 
-Additionally after *subject* ':' you can specify a number of line in that 
-file (from top or bottom, if negative). Default is 1 (the first line from 
-top of file).
+Additionally after *subject* ':' you can specify a number of a line
+in that file (from top otherwise bottom, if negative).
+Default is 1 (the first line from top of file).
 
-Same after *body* you can specify a number of lines of that file (from top 
-or bottom, if negative). Default is 0 - entire file.
+Same after *body* you can specify a number of lines of that file
+(from top otherwise bottom, if negative). Default is 0 - entire file.
 
 In *attach* you can specify a few filenames separated by ',' and ';' 
-(it is adjustable - see *Parameters.ps* below).
 
 If an argument contains spaces, it must be enclosed with quotes "".
 
@@ -78,74 +76,9 @@ If no arguments or there is '?' somewhere, it will be shown this Usage text.
   * 3 - Wrong argument
   * 4 - File not found
 
-## Parameters.cs
-
-```cs
-        /// <summary>
-        /// The email server's IP or DNS host name (if empty: gateway).
-        /// </summary>
-        public const string HOST = "";
-
-        /// <summary>
-        /// The TCP port of SMTP. Default is 25.
-        /// </summary>
-        public const int PORT = 25;
-
-        /// <summary>
-        /// Use the secured connection.
-        /// </summary>
-        public const bool SSL = true;
-
-        /// <summary>
-        /// The timeout in ms.
-        /// </summary>
-        public const int TIMEOUT = 60000;
-
-        /// <summary>
-        /// The sender's name.
-        /// </summary>
-        public const string NAME = "Sender";
-
-        /// <summary>
-        /// The sender's email.
-        /// </summary>
-        public const string FROM = "noreply@bank.ru";
-
-        /// <summary>
-        /// A login to the SMTP server.
-        /// </summary>
-        public const string USER = "sender@bank.ru";
-
-        /// <summary>
-        /// A password encoded in Base64. Do not store any passwords as a plain text!
-        /// </summary>
-        public const string PASS = "********";
-
-        /// <summary>
-        /// Email(s) by default. Maybe separated by ',' signs.
-        /// </summary>
-        public const string TO = "admin@bank.ru";
-
-        /// <summary>
-        /// An array of chars to be list separators.
-        /// </summary>
-        public const string LIST = ",;";
-
-        /// <summary>
-        /// An array of signatures to read files in the proper encoding: -DOS 866 (0), =Windows 1251 (1), *UTF8 (2).
-        /// </summary>
-        public const string MODE = "-=*"; // DOS 866, Windows 1251, UTF8
-```
-
 ## License
 
 Licensed under the [Apache License, Version 2.0].
 
 [Mailer]: https://diev.github.io/Mailer/
 [Apache License, Version 2.0]: http://www.apache.org/licenses/LICENSE-2.0 "LICENSE"
-
-[appveyor]: https://ci.appveyor.com/project/diev/mailer/branch/master
-[releases]: https://github.com/diev/Mailer/releases/latest
-
-[Build status]: https://ci.appveyor.com/api/projects/status/ukoqyhda8b706p02/branch/master?svg=true
-[GitHub Release]: https://img.shields.io/github/release/diev/Mailer.svg

@@ -1,20 +1,29 @@
-﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
-// Licensed under the Apache License, Version 2.0.
-// Source https://github.com/diev/Mailer
+﻿#region License
+/*
+Copyright 2016-2024 Dmitrii Evdokimov
+Open source software
 
-// How to use:
-// Compile with your target
-// C:\Windows\Microsoft.NET\Framework\...\scs.exe /out:Mailer.exe /recurse:*.cs
-// Run Mailer.exe without arguments (or with '?') to get the usage help.
-// Change your const strings in Parameters.cs and just recompile after.
-// You will get your own preconfigured Mailer for your batch scripts.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+#endregion
 
 #define TRACE
 //#define DEBUG
 
-using Lib;
 using System;
 using System.Diagnostics;
+
+using Lib;
 
 namespace Mailer
 {
@@ -35,13 +44,13 @@ namespace Mailer
                 ? Parameters.TO 
                 : args[0];
 
-            string subj = (args.Length > 1) 
-                ? args[1] 
-                : "Message from " + Parameters.NAME;
+            string subj = (args.Length > 1)
+                ? args[1]
+                : $"Message from {Parameters.NAME}.";
 
             string body = (args.Length > 2) 
                 ? args[2] 
-                : "This is a message from " + Parameters.NAME;
+                : $"This is a message from {Parameters.NAME}.";
 
             string attach = (args.Length > 3) 
                 ? args[3] 
@@ -50,6 +59,7 @@ namespace Mailer
             EmailSender sender = new EmailSender();
 
             string[] attachList = null;
+
             if (attach.Length > 0)
             {
                 char[] sep = Parameters.LIST.ToCharArray();
@@ -69,18 +79,13 @@ namespace Mailer
         static void Usage(string err, int exit)
         {
             Console.WriteLine();
-            Console.WriteLine(App.Version + " - " + App.Description);
-            Console.WriteLine(App.Copyright + " - " + "Source https://github.com/diev/Mailer");
-
-            Console.WriteLine("Все константы прописываются в тексте программы, затем она компилируется с помощью");
-            //Console.WriteLine(@"{0}\Microsoft.NET\Framework\...\scs.exe в Вашем Windows).",
-            //    Environment.GetEnvironmentVariable("SystemRoot"));
-            Console.WriteLine(@"%SystemRoot%\Microsoft.NET\Framework\...\scs.exe в Вашей системе Windows.");
+            Console.WriteLine($"{App.Version} - {App.Description}");
+            Console.WriteLine($"{App.Copyright}");
             Console.WriteLine();
 
             if (err.Length > 0)
             {
-                Console.WriteLine("** Ошибка {0}: {1} **", exit, err);
+                Console.WriteLine($"** Ошибка {exit}: {err} **");
                 Console.WriteLine();
             }
 
@@ -88,52 +93,47 @@ namespace Mailer
             string mode = Parameters.MODE;
             string list = Parameters.LIST;
 
-            Console.WriteLine("Константы: {0} ({1}) шлет на {2}:{3}, SSL:{4}, TimeOut:{5}s.",
-                Parameters.FROM, Parameters.NAME, Parameters.HOST, Parameters.PORT, Parameters.SSL, Parameters.TIMEOUT / 1000);
-            Console.WriteLine("Параметры: to subject body attach (обязателен только первый из них).");
+            Console.WriteLine($"Из Windows Credential Manager прочитаны параметры SMTP:");
+            Console.WriteLine($@"{Parameters.FROM} ({Parameters.NAME}) шлет на {Parameters.HOST}:{Parameters.PORT}, TLS:{(Parameters.TLS ? "вкл" : "выкл")}.");
+            Console.WriteLine($"Параметры ком.строки: to subject body attach (обязателен только первый из 4).");
             Console.WriteLine();
-            Console.WriteLine("to можно заменить на -, тогда будет подставлено {0}", to);
-            Console.WriteLine("  из констант. Через запятую можно указать несколько адресатов.");
+            Console.WriteLine($"to можно заменить на -, тогда будет подставлено {to}");
+            Console.WriteLine($"  Через запятую можно указать несколько адресатов.");
             Console.WriteLine();
-            Console.WriteLine("subject и body можно взять из файл(ов), если они начинаются с:");
-            Console.WriteLine("  {0}  кодировка DOS 866", mode[0]);
-            Console.WriteLine("  {0}  кодировка Windows 1251", mode[1]);
-            Console.WriteLine("  {0}  кодировка UTF-8", mode[2]);
-            Console.WriteLine("subject[:N] - взять строку N (по-умолчанию -1 - последнюю).");
-            Console.WriteLine("body[:N] - число строк от начала или конца файла (0 - все).");
+            Console.WriteLine($"subject и body можно взять из файл(ов), если они начинаются с:");
+            Console.WriteLine($"  {mode[0]}  кодировка DOS 866");
+            Console.WriteLine($"  {mode[1]}  кодировка Windows 1251");
+            Console.WriteLine($"  {mode[2]}  кодировка UTF-8");
+            Console.WriteLine($"subject[:N] - взять строку N (по-умолчанию -1 - последнюю).");
+            Console.WriteLine($"body[:N] - число строк от начала или конца файла (0 - все).");
             Console.WriteLine();
-            Console.Write("В body и attach можно указать несколько файлов через {0}", list[0]);
+            Console.Write($"В body и attach можно указать несколько файлов через {list[0]}");
             for (int i = 1; i < list.Length; i++)
             {
-                Console.Write(" или {0}", list[i]);
-            }
+                Console.Write($" или {list[i]}");
+            }   Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine("Если параметр содержит пробелы или пустой, его надо \"заключить в кавычки\".");
-            Console.WriteLine("Если параметров нет вовсе или в них есть ?, то показывается эта помощь.");
+            Console.WriteLine($@"Если параметр содержит пробелы или пустой, его надо ""заключить в кавычки"".");
+            Console.WriteLine($"Если параметров нет вовсе или в них есть ?, то показывается эта помощь.");
             Console.WriteLine();
 
-            Console.WriteLine("Примеры параметров:");
-            //string a = string.Format("{0}@{1}.ru", Environment.GetEnvironmentVariable("USERNAME"),
-            //    Environment.GetEnvironmentVariable("USERDOMAIN")).ToLower();
-            
-            string a = "-";
-
-            Console.WriteLine("  {0} {1}", to, "Test");
-            Console.WriteLine("  {0},b.{0},c.{0} {1} {2}", to, "Test", "Body-text");
-            Console.WriteLine("  {0} \"{1}\" \"{2}\"", a, "Test subject", "Long body text with spaces.");
-            Console.WriteLine("  {0} \"{1}\" {3}{2}", a, "Test DOS file", "filename.txt", mode[0]);
-            Console.WriteLine("  {0} \"{1}\" {3}{2}", a, "Test Win file", "filename.txt", mode[1]);
-            Console.WriteLine("  {0} \"{1}\" {3}{2}", a, "Test UTF file", "filename.txt", mode[2]);
-            Console.WriteLine("  {0} \"{1}\" \"{3}{2}\"", a, "Test include", "Body from DOS 866.txt", mode[0]);
-            Console.WriteLine("  {0} \"{3}{1}\" \"{4}{2}\"", a, "Subject from UTF-8.txt", "Body from DOS 866.txt", mode[2], mode[0]);
-            Console.WriteLine("  {0} \"{1}\" {3}{2}:10", a, "Top 10 lines", @"c:\filename.txt", mode[0]);
-            Console.WriteLine("  {0} \"{1}\" {3}{2}:-5", a, "Last 5 lines", @"c:\filename.txt", mode[0]);
-            Console.WriteLine("  {0} {1} \"\" {1}", a, "report.txt");
-            Console.WriteLine("  {0} {4}{1}:2 \"{2}\" {3}", a, "report.txt", "Date in subj, file attached.", "report.txt", mode[0]);
-            Console.WriteLine("  {0} {3}{1}:-1 \"{2}\"", a, "error.log", "Last error in subj!", mode[1]);
-            Console.WriteLine("  {0} {1} \"{2}\" file1.txt{3}file2.txt{3}file3.txt", a, "Files", "3 attachments.", list[0]);
-            Console.WriteLine("  {0} \"{1}\" \"\" \"Report 2016.xlsm{2} My Doc.docx\"", a, "Just files", list[0]);
+            Console.WriteLine($"Примеры параметров:");
+            Console.WriteLine();
+            Console.WriteLine($"  {to} Test");
+            Console.WriteLine($"  {to},b.{to},c.{to} Test Body-text");
+            Console.WriteLine($@"  - ""Test subject"" ""Long body text with spaces.""");
+            Console.WriteLine($@"  - ""Test DOS file"" {mode[0]}filename.txt");
+            Console.WriteLine($@"  - ""Test WIN file"" {mode[1]}filename.txt");
+            Console.WriteLine($@"  - ""Test UTF file"" {mode[2]}filename.txt");
+            Console.WriteLine($@"  - ""Test include"" ""{mode[0]}Body from DOS 866.txt""");
+            Console.WriteLine($@"  - ""{mode[2]}Subject from UTF-8.txt"" ""{mode[0]}Body from DOS 866.txt""");
+            Console.WriteLine($@"  - ""Top 10 lines"" {mode[0]}c:\filename.txt:10");
+            Console.WriteLine($@"  - ""Last 5 lines"" {mode[0]}c:\filename.txt:-5");
+            Console.WriteLine($@"  - report.txt """" report.txt");
+            Console.WriteLine($@"  - {mode[0]}report.txt:2 ""Date in subj, file attached."" report.txt");
+            Console.WriteLine($@"  - {mode[1]}error.log:-1 ""Last error in subj!""");
+            Console.WriteLine($@"  - Files ""3 attachments."" file1.txt{list[0]}file2.txt{list[0]}file3.txt");
+            Console.WriteLine($@"  - ""Just files"" """" ""Report 2016.xlsm{list[0]}My Doc.docx""");
 
             Environment.Exit(exit);
         }

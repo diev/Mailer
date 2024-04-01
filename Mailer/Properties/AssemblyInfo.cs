@@ -11,9 +11,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Mailer")]
 [assembly: AssemblyDescription("A simple console email sender to send reports from batch files without any configs.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cibank")]
+[assembly: AssemblyCompany("Diev")]
 [assembly: AssemblyProduct("Mailer")]
-[assembly: AssemblyCopyright("Copyright (c) 2016-2021 Dmitrii Evdokimov")]
+[assembly: AssemblyCopyright("Copyright (c) 2016-2024 Dmitrii Evdokimov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номера сборки и редакции по умолчанию 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyVersion("4.2024.401.0")]
+[assembly: AssemblyFileVersion("4.2024.401.0")]
