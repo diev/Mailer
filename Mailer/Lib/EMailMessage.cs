@@ -1,6 +1,21 @@
-﻿// Copyright (c) 2016-2021 Dmitrii Evdokimov. All rights reserved.
-// Licensed under the Apache License, Version 2.0.
-// Source https://github.com/diev/
+﻿#region License
+/*
+Copyright 2016-2024 Dmitrii Evdokimov
+Open source software
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+#endregion
 
 using Mailer;
 
@@ -15,11 +30,14 @@ namespace Lib
 {
     public class EmailMessage : MailMessage
     {
-        public EmailMessage(string recipients, string subject, string body, string[] files)
+        public EmailMessage(string from, string name, string recipients, string subject = "", string body = "", string[] files = null)
         {
-            From = new MailAddress(Parameters.FROM, App.Name, Encoding.UTF8);
+            From = new MailAddress(from, name, Encoding.UTF8);
 
-            To.Add(recipients.Replace(';', ','));
+            To.Add(recipients.Equals('-')
+                ? from
+                : recipients.Replace(';', ','));
+
             // this.CC
             // this.Bcc
             // this.ReplyToList;
@@ -27,10 +45,12 @@ namespace Lib
             // this.IsBodyHtml = true;
             // this.Priority = MailPriority.High;
 
-            string mode = Parameters.MODE;
+            string mode = Program.MODE;
+
             if (subject.Length > 0)
             {
                 int m = mode.IndexOf(subject[0]);
+
                 if (m > -1)
                 {
                     Subject = SubjBuilder(m, subject);
@@ -45,8 +65,9 @@ namespace Lib
             {
                 if (mode.IndexOf(body[0]) > -1)
                 {
-                    string list = Parameters.LIST;
+                    string list = Program.LIST;
                     string[] bodyList = body.Split(list.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
                     foreach (string item in bodyList)
                     {
                         int m = mode.IndexOf(item[0]);
@@ -62,33 +83,37 @@ namespace Lib
                 }
             }
 
-            foreach (string file in files)
+            if (files != null)
             {
-                FileInfo fi = new FileInfo(file.Trim());
-                if (fi.Exists)
+                foreach (string file in files)
                 {
-                    Attachment attachment = new Attachment(fi.FullName);
-                    ContentDisposition disposition = attachment.ContentDisposition;
+                    FileInfo fi = new FileInfo(file.Trim());
 
-                    disposition.CreationDate = fi.CreationTime;
-                    disposition.ModificationDate = fi.LastWriteTime;
-                    disposition.ReadDate = fi.LastAccessTime;
+                    if (fi.Exists)
+                    {
+                        Attachment attachment = new Attachment(fi.FullName);
+                        ContentDisposition disposition = attachment.ContentDisposition;
 
-                    Attachments.Add(attachment);
-                }
-                else
-                {
-                    Trace.TraceWarning("Attachment file " + fi.FullName + " not found!");
+                        disposition.CreationDate = fi.CreationTime;
+                        disposition.ModificationDate = fi.LastWriteTime;
+                        disposition.ReadDate = fi.LastAccessTime;
+
+                        Attachments.Add(attachment);
+                    }
+                    else
+                    {
+                        Trace.TraceWarning("Attachment file " + fi.FullName + " not found!");
+                    }
                 }
             }
         }
 
-        static string SubjBuilder(int mode, string item)
+        private static string SubjBuilder(int mode, string item)
         {
             int line = -1; // the last line by default
             string file = item.Substring(1);
-
             int pos = item.LastIndexOf(':');
+
             if (pos > 2) // *C:\
             {
                 file = item.Substring(1, pos - 1);
@@ -99,12 +124,12 @@ namespace Lib
             return GetSubjContent(file, enc, line);
         }
 
-        static string BodyBuilder(int mode, string item)
+        private static string BodyBuilder(int mode, string item)
         {
             int lines = 0; // all content
             string file = item.Substring(1);
-
             int pos = item.LastIndexOf(':');
+
             if (pos > 2) // *C:\
             {
                 file = item.Substring(1, pos - 1);
@@ -115,7 +140,7 @@ namespace Lib
             return GetBodyContent(file, enc, lines);
         }
 
-        static Encoding GetModeEncoding(int mode)
+        private static Encoding GetModeEncoding(int mode)
         {
             switch (mode)
             {
@@ -130,7 +155,7 @@ namespace Lib
             }
         }
 
-        static string GetSubjContent(string file, Encoding enc, int line)
+        private static string GetSubjContent(string file, Encoding enc, int line)
         {
             if (!File.Exists(file))
             {
@@ -149,7 +174,7 @@ namespace Lib
             }
         }
 
-        static string GetBodyContent(string file, Encoding enc, int lines)
+        private static string GetBodyContent(string file, Encoding enc, int lines)
         {
             if (!File.Exists(file))
             {

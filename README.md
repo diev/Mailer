@@ -10,10 +10,10 @@ Blat when it becomes out of use.
 
 ## Settings
 
-*Windows Credential Manager* (find in *Control Panel*):
+*Windows Credential Manager* (find it in *Control Panel*):
 
 Add a target name: `SMTP {host} {port} [tls]`,
-user: `{sender@host}`, pass: `{password}`.
+with user name: `{sender@host}`, password: `{password}`.
 
 ## Usage
 
@@ -50,8 +50,8 @@ If no arguments or there is '?' somewhere, it will be shown this Usage text.
 
 ## Examples
 
-    Mailer admin@bank.ru Test
-    Mailer admin@bank.ru,b.admin@bank.ru,c.admin@bank.ru Test Body-text
+    Mailer - Test
+    Mailer a,b,c Test Body-text
     Mailer - "Test subject" "Long body text with spaces."
     Mailer - "Test DOS file" -filename.txt
     Mailer - "Test Win file" =filename.txt

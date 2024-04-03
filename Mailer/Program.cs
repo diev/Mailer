@@ -22,6 +22,7 @@ limitations under the License.
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 using Lib;
 
@@ -30,43 +31,50 @@ namespace Mailer
     public static class Program
     {
         /// <summary>
+        /// An array of chars to be list separators.
+        /// </summary>
+        public static string LIST { get; set; } = ",;";
+
+        /// <summary>
+        /// An array of signatures to read files in the proper encoding: -DOS 866 (0), =Windows 1251 (1), *UTF8 (2).
+        /// </summary>
+        public static string MODE { get; set; } = "-=*"; // DOS 866, Windows 1251, UTF8
+
+        /// <summary>
         /// The main entry point to the Application.
         /// </summary>
         /// <param name="args">The array of strings passed as optional parameters to execute.</param>
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Trace.Listeners.Add(new AppTraceListener(App.Log));
 
             if (args.Length == 0 || Environment.CommandLine.Contains("?"))
                 Usage(string.Empty, 2);
 
-            string to = args[0].Equals("-") 
-                ? Parameters.TO 
-                : args[0];
+            string to = args[0];
 
             string subj = (args.Length > 1)
                 ? args[1]
-                : $"Message from {Parameters.NAME}.";
+                : string.Empty;
 
             string body = (args.Length > 2) 
                 ? args[2] 
-                : $"This is a message from {Parameters.NAME}.";
+                : string.Empty;
 
             string attach = (args.Length > 3) 
                 ? args[3] 
                 : string.Empty;
 
-            EmailSender sender = new EmailSender();
-
             string[] attachList = null;
 
             if (attach.Length > 0)
             {
-                char[] sep = Parameters.LIST.ToCharArray();
+                char[] sep = LIST.ToCharArray();
                 attachList = attach.Split(sep, StringSplitOptions.RemoveEmptyEntries);
             }
 
-            sender.SendWait(new EmailMessage(to, subj, body, attachList));
+            Smtp sender = new Smtp();
+            await sender.SendMessageAsync(to, subj, body, attachList);
 
             Environment.Exit(0);
         }
@@ -89,16 +97,13 @@ namespace Mailer
                 Console.WriteLine();
             }
 
-            string to = Parameters.TO;
-            string mode = Parameters.MODE;
-            string list = Parameters.LIST;
+            string mode = MODE;
+            string list = LIST;
 
-            Console.WriteLine($"Из Windows Credential Manager прочитаны параметры SMTP:");
-            Console.WriteLine($@"{Parameters.FROM} ({Parameters.NAME}) шлет на {Parameters.HOST}:{Parameters.PORT}, TLS:{(Parameters.TLS ? "вкл" : "выкл")}.");
-            Console.WriteLine($"Параметры ком.строки: to subject body attach (обязателен только первый из 4).");
+            Console.WriteLine($"Параметры: to subject body attach (обязателен только первый из 4).");
             Console.WriteLine();
-            Console.WriteLine($"to можно заменить на -, тогда будет подставлено {to}");
-            Console.WriteLine($"  Через запятую можно указать несколько адресатов.");
+            Console.WriteLine($"to можно заменить на -, тогда письмо будет отправителю.");
+            Console.WriteLine($"  Или через , или ; можно указать несколько адресатов.");
             Console.WriteLine();
             Console.WriteLine($"subject и body можно взять из файл(ов), если они начинаются с:");
             Console.WriteLine($"  {mode[0]}  кодировка DOS 866");
@@ -119,8 +124,8 @@ namespace Mailer
 
             Console.WriteLine($"Примеры параметров:");
             Console.WriteLine();
-            Console.WriteLine($"  {to} Test");
-            Console.WriteLine($"  {to},b.{to},c.{to} Test Body-text");
+            Console.WriteLine($@"  - Test");
+            Console.WriteLine($@"  a,b,c Test Body-text");
             Console.WriteLine($@"  - ""Test subject"" ""Long body text with spaces.""");
             Console.WriteLine($@"  - ""Test DOS file"" {mode[0]}filename.txt");
             Console.WriteLine($@"  - ""Test WIN file"" {mode[1]}filename.txt");
